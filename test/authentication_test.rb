@@ -89,6 +89,38 @@ class CanonicalStringTest < Test::Unit::TestCase
       assert_equal expected_cleaned_path, Authentication::CanonicalString.new(Net::HTTP::Get.new(uncleaned_path)).send(:path)
     end
   end
+
+  def test_path_includes_response_header_query_strings
+    response_header_query_strings = [
+      '/test/response/header/query/string?response-content-type=foo',
+      '/test/response/header/query/string?response-content-language=bar',
+      '/test/response/header/query/string?response-expires=12345',
+      '/test/response/header/query/string?response-cache-control=foo',
+      '/test/response/header/query/string?response-content-disposition=attachment; filename="foo.mp3"',
+      '/test/response/header/query/string?response-content-encoding=foo'
+    ]
+
+    response_header_query_strings.each do |expected_path|
+      assert_equal expected_path, Authentication::CanonicalString.new(Net::HTTP::Get.new(expected_path)).send(:path)
+    end
+  end
+
+  def test_path_prefers_significant_query_strings_to_response_header_query_string
+    significant_query_strings = [
+      ['/test/query/string?acl&response-content-type=foo', '/test/query/string?acl']
+    ]
+
+    significant_query_strings.each do |uncleaned_path, expected_path|
+      assert_equal expected_path, Authentication::CanonicalString.new(Net::HTTP::Get.new(uncleaned_path)).send(:path)
+    end
+  end
+
+  def test_path_alphabetizes_response_header_query_string
+    uncleaned_path = '/test/response/header/query/string/alphabetization?response-expires=12345&response-content-type=foo'
+    expected_path  = '/test/response/header/query/string/alphabetization?response-content-type=foo&response-expires=12345'
+
+    assert_equal expected_path, Authentication::CanonicalString.new(Net::HTTP::Get.new(uncleaned_path)).send(:path)
+  end
   
   def test_default_headers_set
     Authentication::CanonicalString.default_headers.each do |header|

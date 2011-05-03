@@ -144,6 +144,11 @@ module AWS
           def amazon_header_prefix
             /^#{AMAZON_HEADER_PREFIX}/io
           end
+
+          def response_header_parameters
+            # keep these alphabetized
+            ["response-cache-control", "response-content-disposition", "response-content-encoding", "response-content-language", "response-content-type", "response-expires"]
+          end
         end
         
         attr_reader :request, :headers
@@ -205,11 +210,32 @@ module AWS
           end
 
           def path
-            [only_path, extract_significant_parameter].compact.join('?')
+            [only_path, extract_significant_parameters].compact.join('?')
           end
           
           def extract_significant_parameter
             request.path[/[&?](acl|torrent|logging)(?:&|=|$)/, 1]
+          end
+
+          def extract_response_header_parameters
+            # response_header_parameters are returned alphabetized
+            params = self.class.response_header_parameters.inject([ ]) do |array, parameter|
+              if request.path =~ /[&?](#{parameter}=[^&$]+)/
+                array << $1
+              end
+
+              array
+            end
+
+            params.empty? ? nil : params.join("&")
+          end
+
+          def extract_significant_parameters
+            if param = extract_significant_parameter
+              param
+            else
+              extract_response_header_parameters
+            end
           end
           
           def only_path
