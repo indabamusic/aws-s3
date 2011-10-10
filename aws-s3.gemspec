@@ -1,4 +1,3 @@
-(in /Users/pdswan/Projects/aws-s3)
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
