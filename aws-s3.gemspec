@@ -1,3 +1,4 @@
+(in /Users/pdswan/Projects/aws-s3)
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
@@ -6,7 +7,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marcel Molina Jr."]
-  s.date = %q{2011-10-06}
+  s.date = %q{2011-10-10}
   s.default_executable = %q{s3sh}
   s.description = %q{Client library for Amazon's Simple Storage Service's REST API}
   s.email = %q{marcel@vernix.org}
